@@ -1,0 +1,8 @@
+Single outcome or user defined processes?
+
+Where is the parallel? 
+
+
+- ImageMagick is the library
+
+- thread pool library for parallelism, 
