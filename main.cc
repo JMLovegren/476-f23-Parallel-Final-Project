@@ -10,6 +10,7 @@
 // #include <string>
 // #include <thread>
 #include <Magick++.h> 
+// #include <ImageMagick-7/Magick++.h>
 
 /******************************************************************************/
 
@@ -61,3 +62,5 @@ getFileName ()
   std::cout << "\n";
   return infile;
 }*/
+
+// g++ -I/usr/include/ImageMagick-7 main.cc
