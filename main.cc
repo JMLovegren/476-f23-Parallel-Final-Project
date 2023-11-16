@@ -9,7 +9,10 @@
 // #include <queue>
 // #include <string>
 // #include <thread>
-#include <Magick++.h> 
+
+// #include <Magick++.h> 
+#include <ImageMagick-7/Magick++.h>
+
 
 /******************************************************************************/
 
