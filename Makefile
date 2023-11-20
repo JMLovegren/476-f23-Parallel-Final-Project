@@ -10,13 +10,14 @@ CXX      = g++
 # Use this first configuration for debugging
 #CXXFLAGS := -ggdb -Wall -std=c++23
 # Use the following  configuration for release
-CXXFLAGS := -O3 -Wall -Werror -std=c++23
+# CXXFLAGS := -O3 -Wall -Werror -std=c++23
+CXXFLAGS := -O3 -Wall -Werror -std=c++23 $(shell Magick++-config --cxxflags --cppflags)
 
 # Linker: for C++ should be $(CXX)
 LINK     := $(CXX)
 
 # Linker flags. Usually none.
-LDFLAGS  := 
+LDFLAGS  := $(shell Magick++-config --ldflags --libs)
 
 # Library paths, prefaced with "-L". Usually none.
 LDPATHS := 
@@ -27,7 +28,7 @@ LDLIBS := -ltbb -lfmt
 
 # Executable name. Needs to be the basename of your driver
 #   file. I.e., your driver must be named $(EXEC).cc
-EXEC := Lovegren07
+EXEC := main
 
 #############################################################
 # Rules
@@ -43,7 +44,7 @@ $(EXEC) : $(EXEC).o
 
 # Add rules for each object file
 # No recipes are typically needed
-Lovegren07.o : Lovegren07.cc
+main.o : main.cc
 
 #############################################################
 
