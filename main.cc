@@ -1,4 +1,3 @@
-
 // #include <algorithm>
 // #include <cassert>
 // #include <condition_variable>
@@ -7,20 +6,22 @@
 #include <iostream>
 // #include <mutex>
 // #include <queue>
-// #include <string>
+#include <string>
 // #include <thread>
 
 #include <Magick++.h> 
 
 
-using namespace std; 
 using namespace Magick; 
 
 /******************************************************************************/
 
 
-//std::filesystem::path 
-//getFileName ();
+std::filesystem::path 
+getFileName ();
+
+
+void convertToGIF(std::vector<Image>& images, const std::string& outputGifPath);
 
 /******************************************************************************/
 
@@ -28,33 +29,47 @@ using namespace Magick;
 
 int main(int argc,char **argv) 
 { 
+  std::filesystem::path infile = getFileName();
+  std::string infileString = infile.string ();
+  std::vector<Image> images;
+
   InitializeMagick(*argv);
 
-  // Construct the image object. Seperating image construction from the 
-  // the read operation ensures that a failure to read the image file 
-  // doesn't render the image object useless. 
-  Image image;
-  try { 
-    // Read a file into image object 
-    image.read("Animhorse.gif");
+  try
+  { 
+    Image temp;
+    size_t total_frames = 0;
 
-    // Crop the image to specified size (width, height, xOffset, yOffset)
-    image.crop( Geometry(100,100, 100, 100) );
+    std::string tempIn = infileString + "[-1]";
 
-    // Write the image to a file 
-    image.write("AnimhorseMod.gif"); 
+    temp.ping(tempIn);
+    total_frames = temp.scene() + 1;
+
+    for (size_t i = 0; i < total_frames; ++i) 
+    {
+      images.emplace_back(infileString + "[ " + std::to_string(i) +  "]");
+    }
+
+    for (size_t i = 0; i < total_frames; ++i)
+    {
+      images[i].oilPaint(5);
+      images[i].flop();
+    }
   } 
   catch( Exception &error_ ) 
-    { 
-      cout << "Caught exception: " << error_.what() << endl; 
-      return 1; 
-    } 
+  { 
+    std::cout << "Caught exception: " << error_.what() << std::endl; 
+    return 1; 
+  } 
+
+  std::string outputGifPath = infile.stem().string() + "Mod.gif";
+
+  convertToGIF(images, outputGifPath);
   return 0; 
 } 
 
 /******************************************************************************/
 
-/*
 std::filesystem::path 
 getFileName ()
 {
@@ -63,9 +78,26 @@ getFileName ()
   std::cin >> infile;
   std::cout << "\n";
   return infile;
-}*/
+}
 
-// g++ -I/usr/include/ImageMagick-7 main.cc -Wcpp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16
+/******************************************************************************/
 
-// use this
-// g++ `Magick++-config --cxxflags --cppflags` -O2 -Wall -o main main.cc `Magick++-config --ldflags --libs`
+void convertToGIF(std::vector<Image> & images, const std::string& outputGifPath) 
+{
+  try 
+  {
+      InitializeMagick("");
+
+      // Set Animation Settings
+      for (auto& image : images) {
+          // Set the delay between frames (in 1/100th of a second)
+          image.animationDelay(10);  // Adjust as needed
+      }
+      // Write GIF
+      writeImages(images.begin(), images.end(), outputGifPath);
+  } 
+  catch (Exception& e) 
+  {
+      std::cerr << "Caught exception: " << e.what() << std::endl;
+  }
+}
