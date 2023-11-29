@@ -31,3 +31,7 @@
 *.out
 *.app
 tmp.cc
+FlatIrons.png
+.gitignore
+oilProcess.cc
+FlatIronsOil.png
