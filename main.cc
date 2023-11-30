@@ -3,6 +3,7 @@
 #include <string>
 #include <format>
 #include <fmt/ranges.h>
+#include <omp.h>
 
 #include <Magick++.h> 
 #include "Timer.hpp"
@@ -27,6 +28,9 @@ serialProcess (std::vector<Image>& seriImages, int oilNum);
 void
 parallelProcess (std::vector<Image>& paraImages, int oilNum, int numThreads);
 
+void
+openMP (std::vector<Image>& ompImages, int oilNum);
+
 void convertToGIF(std::vector<Image>& images, const std::string& outputGifPath);
 
 /******************************************************************************/
@@ -43,6 +47,7 @@ int main (int argc, char **argv)
 
   std::vector<Image> seriImages = makeImageObjects (infileString, numFrames);
   std::vector<Image> paraImages = seriImages;
+  std::vector<Image> ompImages = seriImages;
   Timer timer;
 
   // Serial
@@ -67,9 +72,23 @@ int main (int argc, char **argv)
   timer.stop ();
   double paraZipTime = timer.getElapsedMs ();
 
+  // OpenMP
+  timer.start();
+  openMP(ompImages, oilNum);
+  timer.stop();
+  double ompProcTime = timer.getElapsedMs();
+  timer.start();
+  outputGifPath = infile.stem().string() + std::to_string (oilNum) + "OmpMod.gif";
+  convertToGIF(ompImages, outputGifPath);
+  timer.stop();
+  double ompZipTime = timer.getElapsedMs();
+
   fmt::print ("Serial time: {:.2f} ms\nZip Time: {:.2f} ms\n", serProcTime, serZipTime);
   fmt::print ("Parallel time: {:.2f} ms\nZip Time: {:.2f} ms\n", paraProcTime, paraZipTime);
   fmt::print ("Speedup: {:.2f}\n", serProcTime / paraProcTime);
+
+  fmt::print("OpenMP time: {:.2f} ms\nZip Time: {:.2f} ms\n", ompProcTime, ompZipTime);
+  fmt::print("Open MP Speedup: {:.2f}\n", serProcTime / paraProcTime);
 
   return 0; 
 } 
@@ -180,5 +199,15 @@ void convertToGIF(std::vector<Image> & images, const std::string& outputGifPath)
   catch (Exception& e) 
   {
       std::cerr << "Caught exception: " << e.what() << std::endl;
+  }
+}
+
+void
+openMP (std::vector<Image>& ompImages, int oilNum)
+{
+  #pragma omp parallel for
+  for (size_t i = 0; i < ompImages.size (); ++i)
+  {
+    ompImages[i].oilPaint(oilNum);
   }
 }

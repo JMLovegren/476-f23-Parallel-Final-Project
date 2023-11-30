@@ -24,7 +24,7 @@ LDPATHS :=
 
 # Libraries we're using, prefaced with "-l".
 #LDLIBS := -lpthread
-LDLIBS := -ltbb -lfmt -lfreeimageplus
+LDLIBS := -ltbb -lfmt -lfreeimageplus -fopenmp
 
 # Executable name. Needs to be the basename of your driver
 #   file. I.e., your driver must be named $(EXEC).cc
