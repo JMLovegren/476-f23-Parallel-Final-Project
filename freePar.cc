@@ -1,3 +1,12 @@
+/*
+  Filename   : main.cc
+  Author     : Timothy Moser, Jacob Lovegren
+  Course     : CSCI 476
+  Date       : 11/30/2023
+  Assignment : Final Project - Oil Painting
+  Description: Our own version of the oil painting algorithm
+*/
+
 #include <FreeImage.h>
 #include <FreeImagePlus.h>
 #include <vector>
@@ -32,7 +41,7 @@ main (int argc, char** argv)
     FREE_IMAGE_TYPE type = image.getImageType();
     assert (type == FIT_BITMAP);
 
-    int radius = 5;
+    int radius = 15;
     int intensity = 20;
 
     Timer serClock;
@@ -75,9 +84,6 @@ applyOil(fipImage& image, const int height, const int width, const int bytesPerP
             int xMax = std::min((calc + radius), width - bytesPerPixel * 2);
             int yMin = std::max((line - radius), 0);
             int yMax = std::min((line + radius), height - bytesPerPixel * 2);
-            uchar maxRed = 0;
-            uchar maxGreen = 0;
-            uchar maxBlue = 0;
             std::vector<int> avgRed(intensity + 1);
             std::vector<int> avgGreen(intensity + 1);
             std::vector<int> avgBlue(intensity + 1);
@@ -110,7 +116,7 @@ applyOil(fipImage& image, const int height, const int width, const int bytesPerP
                 }
                 if (count <= radius)
                 {
-                    xCount++;
+                    xCount++;     
                 }
                 else
                 {
@@ -145,7 +151,6 @@ parOil(fipImage& image, const int height, const int width, const int bytesPerPix
     {
         uint first = (thread * height) / concur;
         uint second = ((thread + 1) * height) / concur;
-        uint size = second - first;
 
         pool.push_task (parOilProcess, std::ref(image), first, second, height, width, bytesPerPixel, radius, intensity);
     }
@@ -171,9 +176,6 @@ parOilProcess(fipImage& image, int first, int second, int height, int width, int
             int xMax = std::min((calc + radius), width - bytesPerPixel * 2);
             int yMin = std::max((line - radius), 0);
             int yMax = std::min((line + radius), height - bytesPerPixel * 2);
-            uchar maxRed = 0;
-            uchar maxGreen = 0;
-            uchar maxBlue = 0;
             std::vector<int> avgRed(intensity + 1);
             std::vector<int> avgGreen(intensity + 1);
             std::vector<int> avgBlue(intensity + 1);

@@ -3,14 +3,8 @@
 ########################################################
 # C++ compiler
 CXX      = g++
-#CXX := clang++
-#CXX := mpicxx
 
 # C++ compiler flags
-# Use this first configuration for debugging
-#CXXFLAGS := -ggdb -Wall -std=c++23
-# Use the following  configuration for release
-# CXXFLAGS := -O3 -Wall -Werror -std=c++23
 CXXFLAGS := -O3 -Wall -Werror -std=c++23 $(shell Magick++-config --cxxflags --cppflags)
 
 # Linker: for C++ should be $(CXX)
@@ -23,12 +17,11 @@ LDFLAGS  := $(shell Magick++-config --ldflags --libs)
 LDPATHS := 
 
 # Libraries we're using, prefaced with "-l".
-#LDLIBS := -lpthread
 LDLIBS := -ltbb -lfmt -lfreeimageplus -fopenmp
 
-# Executable name. Needs to be the basename of your driver
-#   file. I.e., your driver must be named $(EXEC).cc
-EXEC := main
+# Executable names
+EXEC_MAIN := main
+EXEC_FREEPAR := freePar
 
 #############################################################
 # Rules
@@ -39,19 +32,28 @@ EXEC := main
 
 # Add additional object files if you're using more than one
 #   source file.
-$(EXEC) : $(EXEC).o
+
+# Main target
+all: $(EXEC_MAIN) $(EXEC_FREEPAR)
+
+$(EXEC_MAIN) : main.o
+	$(LINK) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(EXEC_FREEPAR) : freePar.o
 	$(LINK) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 # Add rules for each object file
 # No recipes are typically needed
 main.o : main.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+freePar.o : freePar.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 #############################################################
 
 clean :
-	@$(RM) $(EXEC) a.out core
+	@$(RM) $(EXEC_MAIN) $(EXEC_FREEPAR) a.out core
 	@$(RM) *.o
 	@$(RM) *.d
-	@$(RM) *~ 
-
-#############################################################
+	@$(RM) *~
